@@ -7,13 +7,13 @@ module Datadoge
 
   with_configuration do
     has :environments, classes: Array, default: ['production']
-    has :client, classes: Datadog::Statsd, default: nil
+    has :client, classes: Datadog::Statsd, default: Datadog::Statsd.new
     has :namespace, classes: String, default: 'rails'
   end
 
   class Railtie < Rails::Railtie
     initializer "datadoge.configure_rails_initialization" do |app|
-      $statsd = Datadoge.configuration.client || Datadog::Statsd.new
+      $statsd = Datadoge.configuration.client
 
       ActiveSupport::Notifications.subscribe /process_action.action_controller/ do |*args|
         event = ActiveSupport::Notifications::Event.new(*args)
